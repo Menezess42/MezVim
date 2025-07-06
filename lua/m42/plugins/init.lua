@@ -38,5 +38,5 @@ require('lze').load{
         },
     },
     {import = "m42.plugins.ufo",},
-    {import = "m42.plugins.molten",},
+    -- {import = "m42.plugins.molten",},
 }

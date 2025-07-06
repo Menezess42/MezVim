@@ -69,12 +69,11 @@
                         vim-tmux-navigator
                         nvim-ufo
                         markdown-preview-nvim
-                        image-nvim
                         molten-nvim
-                        jupytext-nvim
+                        image-nvim
                         quarto-nvim
-                        hydra-nvim
                         otter-nvim
+                        jupytext-nvim
                 ];
                 extra = [
                     oil-nvim

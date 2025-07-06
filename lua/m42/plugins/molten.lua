@@ -1,94 +1,97 @@
 -- File: lua/m42/plugins/molten.lua
 -- Integração do plugin molten-nvim em m42
 -- File: lua/m42/plugins/molten.lua
+return {
+  {
+    "benlubas/molten-nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "3rd/image.nvim",
+      "GCBallesteros/jupytext.nvim",
+      "quarto-dev/quarto-nvim",
+    },
+    ft = { "python", "markdown", "jupyter", "ipynb" },
+    event = "BufReadPost",
+    build = ":UpdateRemotePlugins",
+    init = function()
+      vim.g.molten_auto_open_output = false
+      vim.g.molten_image_provider = "image.nvim"
+      vim.g.molten_wrap_output = true
+      vim.g.molten_virt_text_output = true
+      vim.g.molten_virt_lines_off_by_1 = true
+    end,
+    config = function()
+      -- Inicialização padrão do jupytext
+      require("jupytext").setup({
+        style = "markdown",
+        output_extension = "md",
+        force_ft = "markdown",
+      })
 
 
+      -- Quarto para integração de LSP e execução inline
+      require("quarto").setup({
+        lspFeatures = {
+          languages = { "python" },
+          chunks = "all",
+          diagnostics = { enabled = true, triggers = { "BufWritePost" } },
+          completion = { enabled = true },
+        },
+        codeRunner = {
+          enabled = true,
+          default_method = "molten",
+        },
+      })
 
--- return {
---   {
---     "benlubas/molten-nvim",
---     dependencies = {
---       "nvim-lua/plenary.nvim",
---       "3rd/image.nvim",
---       "GCBallesteros/jupytext.nvim",
---       "quarto-dev/quarto-nvim",
---     },
---     ft = { "python", "markdown", "jupyter", "ipynb" },
---     event = "BufReadPost",
---     build = ":UpdateRemotePlugins",
---     init = function()
---       vim.g.molten_auto_open_output = false
---       vim.g.molten_image_provider = "image.nvim"
---       vim.g.molten_wrap_output = true
---       vim.g.molten_virt_text_output = true
---       vim.g.molten_virt_lines_off_by_1 = true
---     end,
---     config = function()
---       -- Inicialização padrão do jupytext
---       require("jupytext").setup({
---         style = "markdown",
---         output_extension = "md",
---         force_ft = "markdown",
---       })
---
---       -- Quarto para integração de LSP e execução inline
---       require("quarto").setup({
---         lspFeatures = {
---           languages = { "python" },
---           chunks = "all",
---           diagnostics = { enabled = true, triggers = { "BufWritePost" } },
---           completion = { enabled = true },
---         },
---         codeRunner = {
---           enabled = true,
---           default_method = "molten",
---         },
---       })
---
---       -- Mapeamentos
---       local map = vim.keymap.set
---       local opts = { noremap = true, silent = true, desc = "Molten" }
---       map("n", "<leader>rr", ":MoltenEvaluateOperator<CR>", opts)
---       map("n", "<leader>rc", ":MoltenEvaluateCell<CR>", opts)
---       map("v", "<leader>r", ":<C-u>MoltenEvaluateVisual<CR>gv", opts)
---       map("n", "<leader>oh", ":MoltenHideOutput<CR>", opts)
---       map("n", "<leader>os", ":MoltenEnterOutput<CR>", opts)
---       map("n", "<leader>cl", ":MoltenClear<CR>", opts)
---       map("n", "<leader>md", ":MoltenDelete<CR>", opts)
---
---       -- Ações específicas para arquivos .ipynb
---       vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
---         pattern = "*.ipynb",
---         callback = function(args)
---           vim.schedule(function()
---             -- Detectar kernel
---             local kernels = vim.fn.MoltenAvailableKernels()
---             local content = vim.fn.join(vim.fn.readfile(args.file), "\n")
---             local metadata = vim.fn.json_decode(content)
---             local kernel_name = metadata and metadata.metadata and metadata.metadata.kernelspec and metadata.metadata.kernelspec.name
---
---             -- Inicializar kernel
---             if kernel_name and vim.tbl_contains(kernels, kernel_name) then
---               vim.cmd("MoltenInit " .. kernel_name)
---             else
---               vim.cmd("MoltenInit python3") -- fallback
---             end
---
---             -- Importar outputs anteriores
---             vim.cmd("MoltenImportOutput")
---           end)
---         end,
---       })
---
---       -- Ao salvar, exportar outputs
---       vim.api.nvim_create_autocmd("BufWritePost", {
---         pattern = "*.ipynb",
---         callback = function()
---           if require("molten.status").initialized() == "Molten" then
---             vim.cmd("MoltenExportOutput!")
---           end
---         end,
---       })
---     end,
---   },
--- }
+      -- Mapeamentos
+      local map = vim.keymap.set
+      local opts = { noremap = true, silent = true, desc = "Molten" }
+      map("n", "<leader>rr", ":MoltenEvaluateOperator<CR>", opts)
+      map("n", "<leader>rc", ":MoltenEvaluateCell<CR>", opts)
+      map("v", "<leader>r", ":<C-u>MoltenEvaluateVisual<CR>gv", opts)
+      map("n", "<leader>oh", ":MoltenHideOutput<CR>", opts)
+      map("n", "<leader>os", ":MoltenEnterOutput<CR>", opts)
+      map("n", "<leader>cl", ":MoltenClear<CR>", opts)
+      map("n", "<leader>md", ":MoltenDelete<CR>", opts)
+
+      -- Ações específicas para arquivos .ipynb
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+        pattern = "*.ipynb",
+        callback = function(args)
+          vim.schedule(function()
+            -- Detectar kernel
+            local kernels = vim.fn.MoltenAvailableKernels()
+            local content = vim.fn.join(vim.fn.readfile(args.file), "\n")
+            local metadata = vim.fn.json_decode(content)
+            local kernel_name = metadata and metadata.metadata and metadata.metadata.kernelspec and metadata.metadata.kernelspec.name
+
+            -- Inicializar kernel
+            if kernel_name and vim.tbl_contains(kernels, kernel_name) then
+              vim.cmd("MoltenInit " .. kernel_name)
+            else
+              vim.cmd("MoltenInit python3") -- fallback
+            end
+
+            -- Importar outputs anteriores
+            vim.cmd("MoltenImportOutput")
+          end)
+        end,
+      })
+
+      -- Ao salvar, exportar outputs
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        pattern = "*.ipynb",
+        callback = function()
+          if require("molten.status").initialized() == "Molten" then
+            vim.cmd("MoltenExportOutput!")
+          end
+        end,
+      })
+    end,
+    require("jupytext").setup({
+        style = "markdown",
+        output_extension = "md",
+        force_ft = "markdown",
+    })
+  },
+}

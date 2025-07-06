@@ -4,74 +4,80 @@
 return {
   {
     "benlubas/molten-nvim",
-    requires = {
-      "samodostal/image.nvim",
+    dependencies = {
       "nvim-lua/plenary.nvim",
-      "GCBallesteros/jupytext.nvim",     -- conversão de notebooks
-      "quarto-dev/quarto-nvim",          -- LSP em células markdown
+      "3rd/image.nvim",
+      "GCBallesteros/jupytext.nvim",
+      "quarto-dev/quarto-nvim",
     },
-    ft = { "markdown", "jupyter", "ipynb" },
-    cmd = { "MoltenStart", "MoltenStop" },
+    ft = { "python", "markdown", "jupyter", "ipynb" },
     event = "BufReadPost",
+    build = ":UpdateRemotePlugins",
     init = function()
-      -- Melhora de UX para notebooks
-      vim.g.molten_auto_open_output     = false  -- evita abrir output automaticamente
-      vim.g.molten_image_provider       = "image.nvim"
-      vim.g.molten_wrap_output          = true
-      vim.g.molten_virt_text_output     = true
-      vim.g.molten_virt_lines_off_by_1  = true
+      vim.g.molten_auto_open_output = false
+      vim.g.molten_image_provider = "image.nvim"
+      vim.g.molten_wrap_output = true
+      vim.g.molten_virt_text_output = true
+      vim.g.molten_virt_lines_off_by_1 = true
     end,
     config = function()
-      -- Keymaps básicos (modifique conforme preferir)
-      local map = vim.keymap.set
-      map("n", "e", ":MoltenEvaluateOperator<CR>", { silent = true, desc = "Evaluate operator" })
-      map("n", "rr", ":MoltenReevaluateCell<CR>",  { silent = true, desc = "Re‑eval cell" })
-      map("v", "r",  ":MoltenEvaluateVisual gv<CR>", { silent = true, desc = "Execute visual selection" })
-      map("n", "os", ":noautocmd MoltenEnterOutput<CR>", { silent = true, desc = "Open output window" })
-      map("n", "oh", ":MoltenHideOutput<CR>", { silent = true, desc = "Hide output window" })
-
-      -- Jupytext: converte .ipynb ↔ markdown
+      -- Inicialização padrão do jupytext
       require("jupytext").setup({
         style = "markdown",
         output_extension = "md",
         force_ft = "markdown",
       })
 
-      -- Quarto‑nvim: LSP completo em células markdown
+      -- Quarto para integração de LSP e execução inline
       require("quarto").setup({
         lspFeatures = {
           languages = { "python" },
-          chunks    = "all",
+          chunks = "all",
           diagnostics = { enabled = true, triggers = { "BufWritePost" } },
-          completion  = { enabled = true },
+          completion = { enabled = true },
         },
-        codeRunner = { enabled = true, default_method = "molten" },
+        codeRunner = {
+          enabled = true,
+          default_method = "molten",
+        },
       })
 
-      -- Autocommands para importar/exportar outputs (Notebook Setup) :contentReference[oaicite:0]{index=0}
-      local imb = function(e)
-        vim.schedule(function()
-          local kernels = vim.fn.MoltenAvailableKernels()
-          local ok, meta = pcall(vim.json.decode, io.open(e.file, "r"):read("a"))
-          local name = ok and meta.metadata.kernelspec.name or nil
-          if not name or not vim.tbl_contains(kernels, name) then
-            local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
-            name = venv and venv:match("/([^/]+)$")
-          end
-          if name and vim.tbl_contains(kernels, name) then
-            vim.cmd(("MoltenInit %s"):format(name))
-          end
-          vim.cmd("MoltenImportOutput")
-        end)
-      end
-      vim.api.nvim_create_autocmd({ "BufAdd", "BufEnter" }, {
+      -- Mapeamentos
+      local map = vim.keymap.set
+      local opts = { noremap = true, silent = true, desc = "Molten" }
+      map("n", "<leader>rr", ":MoltenEvaluateOperator<CR>", opts)
+      map("n", "<leader>rc", ":MoltenEvaluateCell<CR>", opts)
+      map("v", "<leader>r", ":<C-u>MoltenEvaluateVisual<CR>gv", opts)
+      map("n", "<leader>oh", ":MoltenHideOutput<CR>", opts)
+      map("n", "<leader>os", ":MoltenEnterOutput<CR>", opts)
+      map("n", "<leader>cl", ":MoltenClear<CR>", opts)
+      map("n", "<leader>md", ":MoltenDelete<CR>", opts)
+
+      -- Ações específicas para arquivos .ipynb
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
         pattern = "*.ipynb",
-        callback = function(e)
-          if vim.api.nvim_get_vvar("vim_did_enter") == 1 then
-            imb(e)
-          end
+        callback = function(args)
+          vim.schedule(function()
+            -- Detectar kernel
+            local kernels = vim.fn.MoltenAvailableKernels()
+            local content = vim.fn.join(vim.fn.readfile(args.file), "\n")
+            local metadata = vim.fn.json_decode(content)
+            local kernel_name = metadata and metadata.metadata and metadata.metadata.kernelspec and metadata.metadata.kernelspec.name
+
+            -- Inicializar kernel
+            if kernel_name and vim.tbl_contains(kernels, kernel_name) then
+              vim.cmd("MoltenInit " .. kernel_name)
+            else
+              vim.cmd("MoltenInit python3") -- fallback
+            end
+
+            -- Importar outputs anteriores
+            vim.cmd("MoltenImportOutput")
+          end)
         end,
       })
+
+      -- Ao salvar, exportar outputs
       vim.api.nvim_create_autocmd("BufWritePost", {
         pattern = "*.ipynb",
         callback = function()
@@ -83,19 +89,3 @@ return {
     end,
   },
 }
--- return {
---   {
---     "benlubas/molten-nvim",
---     requires = {
---       "samodostal/image.nvim",  -- plugin de renderização de imagens
---       "nvim-lua/plenary.nvim"  -- utilitários Lua para Neovim
---     },
---     ft = { "markdown", "jupyter" },  -- carrega em arquivos Markdown e Jupyter
---     cmd = { "MoltenStart", "MoltenStop" },  -- comandos do plugin
---     event = "BufReadPost",  -- carregamento pós leitura de buffer
---     init = function()
---         vim.g.molten_output_with_max_height = 12
---     end,
---
---   },
--- }

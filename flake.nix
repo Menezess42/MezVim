@@ -75,7 +75,6 @@
                         quarto-nvim
                         hydra-nvim
                         otter-nvim
-#lsp_lines-nvim
                 ];
                 extra = [
                     oil-nvim

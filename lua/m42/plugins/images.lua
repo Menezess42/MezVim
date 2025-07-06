@@ -10,8 +10,8 @@ return {
     -- "benlubas/image.nvim",
     -- dev = true,
     -- enabled = false,
-    cond = not MarkdownMode(),
-    dependencies = { "https://github.com/leafo/magick" },
+    -- cond = not MarkdownMode(),
+    dependencies = { "leafo/magick" },
     ft = { "markdown", "norg" },
     config = function()
       local image = require("image")

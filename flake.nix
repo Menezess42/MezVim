@@ -73,6 +73,8 @@
                         molten-nvim
                         jupytext-nvim
                         quarto-nvim
+                        hydra-nvim
+                        otter-nvim
 #lsp_lines-nvim
                 ];
                 extra = [

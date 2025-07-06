@@ -10,5 +10,9 @@ return {
     ft = { "markdown", "jupyter" },  -- carrega em arquivos Markdown e Jupyter
     cmd = { "MoltenStart", "MoltenStop" },  -- comandos do plugin
     event = "BufReadPost",  -- carregamento pós leitura de buffer
+    init = function()
+        vim.g.molten_output_with_max_height = 12
+    end,
+    
   },
 }

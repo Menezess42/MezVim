@@ -71,6 +71,8 @@
                         markdown-preview-nvim
                         image-nvim
                         molten-nvim
+                        jupytext-nvim
+                        quarto-nvim
 #lsp_lines-nvim
                 ];
                 extra = [

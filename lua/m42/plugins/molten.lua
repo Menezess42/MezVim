@@ -25,4 +25,5 @@ return {
             window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
         },
     }
-},
+}
+

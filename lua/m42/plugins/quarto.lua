@@ -1,13 +1,13 @@
 return {
-  -- {
-  --   "GCBallesteros/jupytext.nvim",
-  --   -- ft = { "ipynb" },
-  --   opts = {
-  --     style = "markdown",
-  --     output_extension = "md",
-  --     force_ft = "markdown",
-  --   },
-  -- },
+  {
+    "GCBallesteros/jupytext.nvim",
+    -- ft = { "ipynb" },
+    opts = {
+      style = "markdown",
+      output_extension = "md",
+      force_ft = "markdown",
+    },
+  },
   { "jmbuhr/otter.nvim", ft = { "markdown", "quarto", "norg" } },
   {
     "quarto-dev/quarto-nvim",

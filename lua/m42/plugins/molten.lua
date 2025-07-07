@@ -11,8 +11,8 @@ return {
             vim.g.molten_output_win_max_height = 20
         end,
         -- após o packadd, você pode chamar setup() se quiser
-        after = function()
-            require("molten").setup {
+        after = function(plugins)
+            require("molten-nvim").setup {
                 -- suas opções extra…
             }
         end,

@@ -1,29 +1,35 @@
 -- m42.plugins.molten.lua
 -- Integração de notebooks Jupyter (*.ipynb) com molten-nvim, quarto-nvim e jupytext via LZE
 return {
-    {
-        "benlubas/molten-nvim",
-        -- version = "^1.0.0", -- use version <2.0.0 to avoid breaking changes
-        dependencies = { "3rd/image.nvim" },
-        build = ":UpdateRemotePlugins",
-        init = function()
-            -- these are examples, not defaults. Please see the readme
-            vim.g.molten_image_provider = "image.nvim"
-            vim.g.molten_output_win_max_height = 20
-        end,
-    },
-    {
-        -- see the image.nvim readme for more information about configuring this plugin
-        "3rd/image.nvim",
-        opts = {
-            backend = "kitty", -- whatever backend you would like to use
-            max_width = 100,
-            max_height = 12,
-            max_height_window_percentage = math.huge,
-            max_width_window_percentage = math.huge,
-            window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
-            window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
-        },
-    }
+  {
+    "benlubas/molten-nvim",
+    -- só carrega ao abrir notebooks
+    ft = "ipynb",
+    -- hooks de inicialização antes de packadd
+    init = function()
+      vim.g.molten_image_provider        = "image.nvim"
+      vim.g.molten_output_win_max_height = 20
+    end,
+    -- após o packadd, você pode chamar setup() se quiser
+    after = function()
+      require("molten").setup {
+        -- suas opções extra…
+      }
+    end,
+  },
+  -- image.nvim
+  {
+    "image.nvim",
+    -- nunca carrega sozinho: só quando o molten chamar packadd
+    module = "image",   -- opcional: dispara require("image") ao packadd
+    -- configurações do próprio plugin
+    init = function()
+      require("image").setup {
+        backend                         = "kitty",
+        max_width                       = 100,
+        max_height                      = 12,
+        window_overlap_clear_enabled    = true,
+      }
+    end,
+  },
 }
-

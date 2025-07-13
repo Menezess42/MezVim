@@ -30,6 +30,11 @@ return {
             i = { ['<c-enter>'] = 'to_fuzzy_refine' },
           },
         },
+        pickers = {
+            find_files = {
+                hhidden = true,
+            },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),

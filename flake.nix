@@ -136,6 +136,8 @@
                 ];
                 always = with pkgs.vimPlugins; [
                     nvim-lspconfig
+                    html5-vim
+                    #vscode-html-language-server
                         lualine-nvim
                         gitsigns-nvim
                         vim-sleuth

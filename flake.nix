@@ -53,10 +53,10 @@
 # and each will be its own sub category
             };
             js = with pkgs; [
-            typescript-language-server
-            tailwindcss-language-server
-            vscode-langservers-extracted
-            emmet-ls
+                typescript-language-server
+                    tailwindcss-language-server
+                    vscode-langservers-extracted
+                    emmet-ls
             ];
         };
         startupPlugins = {
@@ -156,9 +156,9 @@
                         vim-startuptime
                 ];
             };
-            js = with pkgs; [
-            vimPlugins.nvim-ts-autotag
-            vimPlugins.cmp-npm
+            js = with pkgs.vimPlugins; [
+            nvim-ts-autotag
+            cmp-npm
             ];
         };
         sharedLibraries = {

@@ -105,6 +105,7 @@ servers.jedi_language_server = {
 }
 -- servers.rust_analyzer = {},
 -- servers.tsserver = {},
+if nixCats('js') then
 servers.ts_ls = {
     init_options = {
         preferences = {
@@ -148,6 +149,7 @@ servers.cssls = {
         },
     },
 }
+end
 
 
 if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then

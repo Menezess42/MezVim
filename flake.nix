@@ -52,6 +52,12 @@
                 inherit (pkgs) nix-doc lua-language-server nixd;
 # and each will be its own sub category
             };
+            js = with pkgs; [
+            typescript-language-server
+            tailwindcss-language-server
+            vscode-langservers-extracted
+            emmet-ls
+            ];
         };
         startupPlugins = {
             debug = with pkgs.vimPlugins; [
@@ -69,11 +75,6 @@
                         vim-tmux-navigator
                         nvim-ufo
                         markdown-preview-nvim
-                        # molten-nvim
-                        # image-nvim
-                        # quarto-nvim
-                        # otter-nvim
-                        # jupytext-nvim
                 ];
                 extra = [
                     oil-nvim
@@ -136,8 +137,7 @@
                 ];
                 always = with pkgs.vimPlugins; [
                     nvim-lspconfig
-                    html5-vim
-                    #vscode-html-language-server
+                        html5-vim
                         lualine-nvim
                         gitsigns-nvim
                         vim-sleuth
@@ -155,11 +155,11 @@
                         indent-blankline-nvim
                         vim-startuptime
                 ];
-# molten = with pkgs.vimPlugins; [
-#     image-nvim
-#         molten-nvim
-# ];
             };
+            js = with pkgs; [
+            vimPlugins.nvim-ts-autotag
+            vimPlugins.cmp-npm
+            ];
         };
         sharedLibraries = {
             general = with pkgs; [
@@ -211,6 +211,7 @@
                 };
                 lspDebugMode=false;
                 moltenDeps = true;
+                js = true;
             };
             extra = {
                 nixdExtras = {

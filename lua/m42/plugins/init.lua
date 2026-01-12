@@ -38,6 +38,5 @@ require('lze').load{
         },
     },
     {import = "m42.plugins.ufo",},
-    {import = "m42.plugins.dap-python"}
-    -- {import = "m42.plugins.test"}
+    -- {import = "m42.plugins.dap-python"} # To be tested
 }

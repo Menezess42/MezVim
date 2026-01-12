@@ -7,7 +7,8 @@ return {
         vim.cmd.packadd(name)
         vim.cmd.packadd("nvim-treesitter-textobjects")
     end,
-    after = function (plugin) require('nvim-treesitter.configs').setup {
+    after = function (plugin)
+      require('nvim-treesitter').setup {
         highlight = { enable = true, },
         indent = { enable = false, },
         incremental_selection = {
@@ -22,7 +23,7 @@ return {
         textobjects = {
           select = {
             enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            lookahead = true,
             keymaps = {
               ['aa'] = '@parameter.outer',
               ['ia'] = '@parameter.inner',
@@ -34,7 +35,7 @@ return {
           },
           move = {
             enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
+            set_jumps = true,
             goto_next_start = {
               [']m'] = '@function.outer',
               [']]'] = '@class.outer',

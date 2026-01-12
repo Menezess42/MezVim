@@ -5,6 +5,7 @@ require('m42.plugins.rainbowDelimiter')
 
 require('lze').load{
     {import = "m42.plugins.telescope", },
+    {import = "m42.plugins.treesitter", },
     {import = "m42.plugins.completion", },
     {import = "m42.plugins.autopairs", },
     {import = "m42.plugins.lazydev",},
@@ -38,5 +39,4 @@ require('lze').load{
     },
     {import = "m42.plugins.ufo",},
     -- {import = "m42.plugins.test"}
-    -- {import = "m42.plugins.treesitter", },
 }

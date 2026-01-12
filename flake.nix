@@ -205,6 +205,7 @@
                 general = true;
                 lint = true;
                 format = true;
+                debug = true;
                 neonixdev = true;
                 test = {
                     subtest1 = true;

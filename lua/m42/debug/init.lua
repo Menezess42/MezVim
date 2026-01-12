@@ -97,14 +97,6 @@ require('lze').load {
         end,
     },
     {
-        "nvim-dap-go",
-        for_cat = { cat = 'debug.go', default = false },
-        on_plugin = { "nvim-dap", },
-        after = function(plugin)
-            require("dap-go").setup()
-        end,
-    },
-    {
         "nvim-dap-python",
         for_cat = { cat = "debug.python", default = false },
         on_plugin = { "nvim-dap", },

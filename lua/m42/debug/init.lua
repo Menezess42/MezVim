@@ -96,12 +96,4 @@ require('lze').load {
             -- either in here, or in a separate plugin spec as demonstrated for go below.
         end,
     },
-    {
-        "nvim-dap-python",
-        for_cat = { cat = "debug.python", default = false },
-        on_plugin = { "nvim-dap", },
-        after = function(plugin)
-            require('dap-python').setup()
-        end,
-    },
 }

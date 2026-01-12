@@ -3,6 +3,9 @@ return {
     "dap-python-config",
     for_cat = { cat = 'debug', default = false },
     ft = { "python" },
+
+    requires = { "nvim-dap" },  -- garante que o dap exista
+
     after = function()
       local dap = require("dap")
 

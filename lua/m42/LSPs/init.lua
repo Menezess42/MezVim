@@ -18,8 +18,7 @@ if nixCats('neonixdev') then
     servers.nixd = {
       nixd = {
         nixpkgs = {
-          -- nixd requires some configuration in flake based configs.
-          -- luckily, the nixCats plugin is here to pass whatever we need! expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
+          expr = [[import (builtins.getFlake "]] .. nixCats.extra("nixdExtras.nixpkgs") .. [[") { }   ]],
         },
         formatting = {
           command = { "nixfmt" }
@@ -31,22 +30,15 @@ if nixCats('neonixdev') then
         }
       }
     }
-    -- If you integrated with your system flake,
-    -- you should pass inputs.self as nixdExtras.flake-path
-    -- that way it will ALWAYS work, regardless
-    -- of where your config actually was.
-    -- otherwise flake-path could be an absolute path to your system flake, or nil or false
     if nixCats.extra("nixdExtras.flake-path") then
       local flakePath = nixCats.extra("nixdExtras.flake-path")
       if nixCats.extra("nixdExtras.systemCFGname") then
-        -- (builtins.getFlake "<path_to_system_flake>").nixosConfigurations."<name>".options
         servers.nixd.nixd.options.nixos = {
           expr = [[(builtins.getFlake "]] .. flakePath ..  [[").nixosConfigurations."]] ..
             nixCats.extra("nixdExtras.systemCFGname") .. [[".options]]
         }
       end
       if nixCats.extra("nixdExtras.homeCFGname") then
-        -- (builtins.getFlake "<path_to_system_flake>").homeConfigurations."<name>".options
         servers.nixd.nixd.options["home-manager"] = {
           expr = [[(builtins.getFlake "]] .. flakePath .. [[").homeConfigurations."]]
             .. nixCats.extra("nixdExtras.homeCFGname") .. [[".options]]
@@ -57,54 +49,37 @@ if nixCats('neonixdev') then
     servers.rnix = {}
     servers.nil_ls = {}
   end
-
 end
 
 if nixCats('go') then
   servers.gopls = {}
 end
 
--- This is this flake's version of what kickstarter has set up for mason handlers.
--- This is a convenience function that calls lspconfig on the lsps we downloaded via nix
--- This will not download your lsp. Nix does that.
-
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---  All of them are listed in https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md # MAKE A PULLREQUEST HERE
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
---  You may do the same thing with cmd
-
--- servers.clangd = {},
--- servers.gopls = {},
 servers.pyright = {
     python = {
         analysis = {
             autoImportCompletions = true,
-            typeCheckingMode = "basic", -- Opções: off, basic, strict
+            typeCheckingMode = "basic",
             useLibraryCodeForTypes = true,
         },
-        -- pythonPath = "python3", -- Você pode especificar o caminho do Python se necessário
     },
 }
 
 servers.jedi_language_server = {
     python = {
         completion = {
-            enable = true,  -- Habilita completamento automático
-            disableSnippets = true,  -- Desabilita snippets para evitar redundância
+            enable = true,
+            disableSnippets = true,
         },
         hover = {
-            enable = true,  -- Habilita hover para tipos e descrições de variáveis
+            enable = true,
         },
         signature = {
-            enable = true,  -- Habilita assinatura de funções
+            enable = true,
         },
     },
 }
--- servers.rust_analyzer = {},
--- servers.tsserver = {},
+
 if nixCats('js') then
 servers.ts_ls = {
     init_options = {
@@ -119,7 +94,7 @@ servers.html = {
     settings = {
         html = {
             format = {
-                enable = true, -- Ativar formatação automática
+                enable = true,
             },
             hover = {
                 documentation = true,
@@ -127,7 +102,7 @@ servers.html = {
             },
             validate = true,
             suggest = {
-                html5 = true, -- Sugestões específicas para HTML5
+                html5 = true,
             },
         },
     },
@@ -136,9 +111,9 @@ servers.html = {
 servers.cssls = {
     settings = {
         css = {
-            validate = true, -- Validação de CSS
+            validate = true,
             lint = {
-                unknownAtRules = "ignore", -- Evita alertas em regras desconhecidas
+                unknownAtRules = "ignore",
             },
         },
         scss = {
@@ -151,15 +126,10 @@ servers.cssls = {
 }
 end
 
-
 if not require('nixCatsUtils').isNixCats and nixCats('lspDebugMode') then
   vim.lsp.set_log_level("debug")
 end
--- If you were to comment out this autocommand
--- and instead pass the on attach function directly to
--- nvim-lspconfig, it would do the same thing.
--- come to think of it, it might be better because then lspconfig doesnt have to be called before lsp attach?
--- but you would still end up triggering on a FileType event anyway, so, it makes little difference.
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('nixCats-lsp-attach', { clear = true }),
   callback = function(event)
@@ -180,14 +150,12 @@ require('lze').load {
     after = function(plugin)
       if require('nixCatsUtils').isNixCats then
         for server_name, cfg in pairs(servers) do
-          require('lspconfig')[server_name].setup({
+          vim.lsp.config(server_name, {
             capabilities = require('m42.LSPs.caps-on_attach').get_capabilities(server_name),
-            -- this line is interchangeable with the above LspAttach autocommand
-            -- on_attach = require('m42.LSPs.caps-on_attach').on_attach,
             settings = cfg,
             filetypes = (cfg or {}).filetypes,
             cmd = (cfg or {}).cmd,
-            root_pattern = (cfg or {}).root_pattern,
+            root_dir = (cfg or {}).root_pattern,
           })
         end
       else
@@ -198,13 +166,11 @@ require('lze').load {
         }
         mason_lspconfig.setup_handlers {
           function(server_name)
-            require('lspconfig')[server_name].setup {
+            vim.lsp.config(server_name, {
               capabilities = require('m42.LSPs.caps-on_attach').get_capabilities(server_name),
-              -- this line is interchangeable with the above LspAttach autocommand
-              -- on_attach = require('m42.LSPs.caps-on_attach').on_attach,
               settings = servers[server_name],
               filetypes = (servers[server_name] or {}).filetypes,
-            }
+            })
           end,
         }
       end

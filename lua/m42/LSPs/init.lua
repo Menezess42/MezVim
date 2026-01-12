@@ -180,7 +180,7 @@ require('lze').load {
     after = function(plugin)
       if require('nixCatsUtils').isNixCats then
         for server_name, cfg in pairs(servers) do
-          require('vim.lsp.config')[server_name].setup({
+          require('lspconfig')[server_name].setup({
             capabilities = require('m42.LSPs.caps-on_attach').get_capabilities(server_name),
             -- this line is interchangeable with the above LspAttach autocommand
             -- on_attach = require('m42.LSPs.caps-on_attach').on_attach,
@@ -198,7 +198,7 @@ require('lze').load {
         }
         mason_lspconfig.setup_handlers {
           function(server_name)
-            require('vim.lsp.config')[server_name].setup {
+            require('lspconfig')[server_name].setup {
               capabilities = require('m42.LSPs.caps-on_attach').get_capabilities(server_name),
               -- this line is interchangeable with the above LspAttach autocommand
               -- on_attach = require('m42.LSPs.caps-on_attach').on_attach,

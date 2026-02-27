@@ -5,14 +5,11 @@ return {
         event = "DeferredUIEnter",
         after = function (plugin)
             require('which-key').setup({
+                icons = {
+                    rules = false;
+                },
                 win = {
-                    -- don't allow the popup to overlap with the cursor
                     no_overlap = true,
-                    -- width = 1,
-                    -- height = { min = 4, max = 25 },
-                    -- col = 0,
-                    -- row = math.huge,
-                    -- border = "none",
                     padding = { 1, 2 }, -- extra window padding [top/bottom, right/left]
                     title = true,
                     title_pos = "center",

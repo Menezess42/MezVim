@@ -1,9 +1,6 @@
 require('m42.options')
 require('m42.remap')
-
--- require("lze").register_handlers(require('lze.x'))
 require("lze").register_handlers(require('nixCatsUtils.lzUtils').for_cat)
-
 
 if nixCats('debug') then
     require('m42.debug')
